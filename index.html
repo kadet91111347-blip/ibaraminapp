@@ -9,7 +9,7 @@
 // Stores current version in localStorage; if it changes, replace URL with cache-bust query.
 (function(){
   try{
-    var v='v44';
+    var v='v45';
     var saved=localStorage.getItem('__ib_version');
     if(saved && saved!==v){
       var u=location.pathname+'?v='+v+'&t='+Date.now();
@@ -107,7 +107,7 @@ a{color:inherit;text-decoration:none}
 </style>
 </head>
 <body>
-<div id="vmark" style="background:linear-gradient(90deg,#22C55E,#16A34A);padding:10px;text-align:center;font-size:13px;font-weight:700;color:#0B0B0F">v44 · 18:02 · 3 кнопки оплаты: ⭐ Stars / 💳 Тинькофф / 💎 TON</div>
+<div id="vmark" style="background:linear-gradient(90deg,#22C55E,#16A34A);padding:10px;text-align:center;font-size:13px;font-weight:700;color:#0B0B0F">v45 · 18:57 · инвойс идёт в личку автоматически: ⭐ Stars / 💳 Тинькофф / 💎 TON</div>
 <script>
 setTimeout(()=>{const m=document.getElementById('vmark');if(m&&location.search.indexOf('keep')<0)m.style.display='none';},12000);
 </script>
@@ -503,8 +503,19 @@ function openSellForm(){
 window.payMethod=function(method, botUrl, card, amount, listingId){
   haptic('medium');
   if(method==='stars'){
-    // Stars — открываем бот, он пришлёт квитанцию
-    openLink(botUrl);
+    // Stars — invoice уже пришёл в личку бота сразу после создания объявления
+    // Открываем бота (без deep-link, чтобы бот не потерял контекст)
+    openLink('https://t.me/Ibaraholka_bot');
+    // Показываем модалку с инструкцией
+    const html='<div class="mbg" onclick="if(event.target===this)closeModal()"><div class="modal" style="position:relative;text-align:left;max-width:340px">'+
+      '<button class="modal-close" onclick="closeModal()">✕</button>'+
+      '<h2 style="font-size:18px;margin:0 0 8px">⭐ Stars-инвойс</h2>'+
+      '<p style="font-size:13px;color:#a1a1aa;margin-bottom:14px;line-height:1.5">Инвойс уже отправлен ботом в личку — обычно приходит за 1–2 секунды.<br><br>Открой <b>@Ibaraholka_bot</b> в Telegram и нажми на кнопку <b>«Оплатить»</b> в сообщении.</p>'+
+      '<a href="https://t.me/Ibaraholka_bot" target="_blank" class="btn-cta" style="display:block;text-align:center;background:linear-gradient(135deg,#FFB800,#FF8C00);color:#0B0B0F;font-weight:700;padding:14px;border-radius:12px;text-decoration:none;margin-bottom:8px">📲 Открыть бота</a>'+
+      '<button class="btn-cta" style="width:100%;background:transparent;color:#a1a1aa" onclick="closeModal()">Закрыть</button>'+
+      '</div></div>';
+    document.body.insertAdjacentHTML('beforeend',html);
+    haptic('success');
     return;
   }
   if(method==='tinkoff'){
